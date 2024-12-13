@@ -2,8 +2,8 @@
   <div
     data-pyro-terminal
     :class="[
-      'terminal-font console relative z-[1] flex h-full w-full flex-col items-center justify-between overflow-hidden rounded-t-xl px-1 text-sm transition-transform duration-300',
-      { 'scale-fullscreen screen-fixed inset-0 z-50 !rounded-none': isFullScreen },
+      'terminal-font console relative z-[1] flex h-[600px] w-full flex-col items-center justify-between overflow-hidden rounded-t-xl px-1 text-sm transition-transform duration-300',
+      { 'scale-fullscreen screen-fixed inset-0 z-50 !h-full !rounded-none': isFullScreen },
     ]"
     tabindex="-1"
   >
