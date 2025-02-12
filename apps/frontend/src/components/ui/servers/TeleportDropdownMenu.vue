@@ -132,6 +132,7 @@ const isOpen = ref(false);
 const openDropdownCount = ref(0);
 const listboxId = `pyro-listbox-${Math.random().toString(36).substring(2, 11)}`;
 const triggerRef = ref<HTMLButtonElement | null>(null);
+const originalOverflow = ref<string>();
 
 const positionStyle = ref<CSSProperties>({
   position: "fixed",
@@ -288,7 +289,13 @@ const openDropdown = async () => {
     dropdownVisible.value = true;
     isOpen.value = true;
     openDropdownCount.value++;
-    document.body.style.overflow = "hidden";
+
+    // Store and set overflow only if not already hidden
+    originalOverflow.value = document.body.style.overflow;
+    if (originalOverflow.value !== "hidden") {
+      document.body.style.overflow = "hidden";
+    }
+
     await updatePosition();
 
     nextTick(() => {
@@ -302,9 +309,12 @@ const closeDropdown = () => {
     dropdownVisible.value = false;
     isOpen.value = false;
     openDropdownCount.value--;
-    if (openDropdownCount.value === 0) {
-      document.body.style.overflow = "";
+
+    // Only restore overflow if we changed it
+    if (openDropdownCount.value === 0 && originalOverflow.value !== "hidden") {
+      document.body.style.overflow = originalOverflow.value || "";
     }
+
     focusedOptionIndex.value = null;
     triggerRef.value?.focus();
   }
@@ -422,8 +432,8 @@ onUnmounted(() => {
 
   if (isOpen.value) {
     openDropdownCount.value--;
-    if (openDropdownCount.value === 0) {
-      document.body.style.overflow = "";
+    if (openDropdownCount.value === 0 && originalOverflow.value !== "hidden") {
+      document.body.style.overflow = originalOverflow.value || "";
     }
   }
 });
