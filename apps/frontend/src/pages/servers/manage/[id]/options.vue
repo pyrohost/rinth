@@ -1,5 +1,5 @@
 <template>
-  <UiServersServerSidebar :route="route" :nav-links="navLinks" :server="props.server" />
+  <UiServersServerSidebarPage :route="route" :nav-links="navLinks" :server="props.server" />
 </template>
 
 <script setup lang="ts">

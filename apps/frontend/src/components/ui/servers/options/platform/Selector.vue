@@ -5,7 +5,7 @@
       :key="loader.name"
       class="group relative flex items-center justify-between rounded-2xl p-2 pr-2.5 hover:bg-bg"
     >
-      <UiServersLoaderSelectorCard
+      <UiServersOptionsPlatformSelectorCard
         :loader="loader"
         :is-current="isCurrentLoader(loader.name)"
         :loader-version="data.loader_version"
@@ -24,7 +24,7 @@
         :key="loader.name"
         class="group relative flex items-center justify-between rounded-2xl p-2 pr-2.5 hover:bg-bg"
       >
-        <UiServersLoaderSelectorCard
+        <UiServersOptionsPlatformSelectorCard
           :loader="loader"
           :is-current="isCurrentLoader(loader.name)"
           :loader-version="data.loader_version"
@@ -44,7 +44,7 @@
         :key="loader.name"
         class="group relative flex items-center justify-between rounded-2xl p-2 pr-2.5 hover:bg-bg"
       >
-        <UiServersLoaderSelectorCard
+        <UiServersOptionsPlatformSelectorCard
           :loader="loader"
           :is-current="isCurrentLoader(loader.name)"
           :loader-version="data.loader_version"

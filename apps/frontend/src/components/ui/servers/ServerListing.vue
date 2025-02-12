@@ -43,7 +43,7 @@
         </div>
         <div v-else class="min-h-[20px]"></div>
 
-        <UiServersServerInfoLabels
+        <UiServersLabels
           :server-data="{ game, mc_version, loader, loader_version, net }"
           :show-game-label="showGameLabel"
           :show-loader-label="showLoaderLabel"
@@ -56,7 +56,7 @@
       v-if="status === 'suspended' && suspension_reason === 'upgrading'"
       class="relative -mt-4 flex w-full flex-row items-center gap-2 rounded-b-3xl bg-bg-blue p-4 text-sm font-bold text-contrast"
     >
-      <UiServersPanelSpinner />
+      <LazyUiServersIconsSpinnerIcon />
       Your server's hardware is currently being upgraded and will be back online shortly.
     </div>
     <div

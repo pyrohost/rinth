@@ -1,18 +1,18 @@
 <template>
-  <LazyUiServersPlatformVersionSelectModal
+  <LazyUiServersOptionsPlatformReinstallModal
     ref="versionSelectModal"
     :server="props.server"
     :current-loader="data?.loader as Loaders"
     @reinstall="emit('reinstall', $event)"
   />
 
-  <LazyUiServersPlatformMrpackModal
+  <LazyUiServersOptionsPlatformMrpackUploadModal
     ref="mrpackModal"
     :server="props.server"
     @reinstall="emit('reinstall', $event)"
   />
 
-  <LazyUiServersPlatformChangeModpackVersionModal
+  <LazyUiServersOptionsPlatformChangeVersionModal
     ref="modpackVersionModal"
     :server="props.server"
     :project="data?.project"
@@ -125,7 +125,7 @@
           }"
           :tabindex="props.server.general?.status === 'installing' ? -1 : 0"
         >
-          <UiServersLoaderSelector
+          <UiServersOptionsPlatformSelector
             :data="data"
             :is-installing="isInstalling"
             @select-loader="selectLoader"

@@ -9,7 +9,11 @@
       @click="$emit('sort', 'name')"
     >
       <span>Name</span>
-      <ChevronUpIcon v-if="sortField === 'name' && !sortDesc" class="h-3 w-3" aria-hidden="true" />
+      <ChevronDownIcon
+        v-if="sortField === 'name' && !sortDesc"
+        class="h-3 w-3"
+        aria-hidden="true"
+      />
       <ChevronDownIcon v-if="sortField === 'name' && sortDesc" class="h-3 w-3" aria-hidden="true" />
     </button>
     <div class="flex shrink-0 gap-4 text-right md:gap-12">
@@ -51,8 +55,8 @@
 </template>
 
 <script setup lang="ts">
-import ChevronDownIcon from "./icons/ChevronDownIcon.vue";
-import ChevronUpIcon from "./icons/ChevronUpIcon.vue";
+import ChevronDownIcon from "../icons/ChevronDownIcon.vue";
+import ChevronUpIcon from "../icons/ChevronUpIcon.vue";
 
 defineProps<{
   sortField: string;

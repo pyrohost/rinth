@@ -325,8 +325,8 @@ import {
 } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
-import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
-import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
+import FilesUploadDragAndDrop from "~/components/ui/servers/files/UploadDragAndDrop.vue";
+import FilesUploadDropdown from "~/components/ui/servers/files/UploadDropdown.vue";
 import type { Server } from "~/composables/pyroServers";
 import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
 

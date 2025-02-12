@@ -1,25 +1,25 @@
 <template>
   <div data-pyro-file-manager-root class="contents">
-    <LazyUiServersFilesCreateItemModal
+    <LazyUiServersFilesModalCreateItem
       ref="createItemModal"
       :type="newItemType"
       @create="handleCreateNewItem"
     />
 
-    <LazyUiServersFilesRenameItemModal
+    <LazyUiServersFilesModalRenameItem
       ref="renameItemModal"
       :item="selectedItem"
       @rename="handleRenameItem"
     />
 
-    <LazyUiServersFilesMoveItemModal
+    <LazyUiServersFilesModalMoveItem
       ref="moveItemModal"
       :item="selectedItem"
       :current-path="currentPath"
       @move="handleMoveItem"
     />
 
-    <LazyUiServersFilesDeleteItemModal
+    <LazyUiServersFilesModalDeleteItem
       ref="deleteItemModal"
       :item="selectedItem"
       @delete="handleDeleteItem"
@@ -31,7 +31,7 @@
     >
       <div ref="mainContent" class="relative isolate flex w-full flex-col">
         <div v-if="!isEditing" class="contents">
-          <UiServersFilesBrowseNavbar
+          <UiServersFilesNavbarBrowse
             :breadcrumb-segments="breadcrumbSegments"
             :search-query="searchQuery"
             :current-filter="viewFilter"
@@ -41,7 +41,7 @@
             @filter="handleFilter"
             @update:search-query="searchQuery = $event"
           />
-          <UiServersFilesLabelBar
+          <UiServersFilesNavbarColumns
             :sort-field="sortMethod"
             :sort-desc="sortDesc"
             @sort="handleSort"
@@ -56,7 +56,7 @@
           />
         </div>
 
-        <UiServersFilesEditingNavbar
+        <UiServersFilesNavbarEditing
           v-else
           :file-name="editingFile?.name"
           :is-image="isEditingImage"
@@ -97,9 +97,8 @@
           />
           <UiServersFilesImageViewer v-else :image-blob="imagePreview" />
         </div>
-
         <div v-else-if="items.length > 0" class="h-full w-full overflow-hidden rounded-b-2xl">
-          <UiServersFileVirtualList
+          <UiServersFilesVirtualList
             :items="filteredItems"
             @delete="showDeleteModal"
             @rename="showRenameModal"
@@ -107,7 +106,7 @@
             @move="showMoveModal"
             @move-direct-to="handleDirectMove"
             @edit="editFile"
-            @contextmenu="showContextMenu"
+            @contextmenu="(item: any, x: number, y: number) => showContextMenu(item, x, y)"
             @load-more="handleLoadMore"
           />
         </div>
@@ -123,7 +122,7 @@
           </div>
         </div>
 
-        <LazyUiServersFileManagerError
+        <LazyUiServersFilesManagerError
           v-else-if="loadError"
           title="Unable to load files"
           message="The folder may not exist."
@@ -143,7 +142,7 @@
       </div>
     </FilesUploadDragAndDrop>
 
-    <UiServersFilesContextMenu
+    <UiServersFilesItemContextMenu
       ref="contextMenu"
       :item="contextMenuInfo.item"
       :x="contextMenuInfo.x"
@@ -161,8 +160,8 @@
 import { useInfiniteScroll } from "@vueuse/core";
 import { UploadIcon, FolderOpenIcon } from "@modrinth/assets";
 import type { DirectoryResponse, DirectoryItem, Server } from "~/composables/pyroServers";
-import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
-import FilesUploadDropdown from "~/components/ui/servers/FilesUploadDropdown.vue";
+import FilesUploadDragAndDrop from "~/components/ui/servers/files/UploadDragAndDrop.vue";
+import FilesUploadDropdown from "~/components/ui/servers/files/UploadDropdown.vue";
 
 interface BaseOperation {
   type: "move" | "rename";

@@ -1,19 +1,19 @@
 <template>
   <div class="contents">
     <div v-if="data" class="contents">
-      <LazyUiServersBackupCreateModal
+      <LazyUiServersBackupsCreateModal
         ref="createBackupModal"
         :server="server"
         @backup-created="handleBackupCreated"
       />
-      <LazyUiServersBackupRenameModal
+      <LazyUiServersBackupsRenameModal
         ref="renameBackupModal"
         :server="server"
         :current-backup-id="currentBackup"
         :backup-name="renameBackupName"
         @backup-renamed="handleBackupRenamed"
       />
-      <LazyUiServersBackupRestoreModal
+      <LazyUiServersBackupsRestoreModal
         ref="restoreBackupModal"
         :server="server"
         :backup-id="currentBackup"
@@ -21,7 +21,7 @@
         :backup-created-at="currentBackupDetails?.created_at ?? ''"
         @backup-restored="handleBackupRestored"
       />
-      <LazyUiServersBackupDeleteModal
+      <LazyUiServersBackupsDeleteModal
         ref="deleteBackupModal"
         :server="server"
         :backup-id="currentBackup"
@@ -30,7 +30,7 @@
         @backup-deleted="handleBackupDeleted"
       />
 
-      <LazyUiServersBackupSettingsModal ref="backupSettingsModal" :server="server" />
+      <LazyUiServersBackupsAutoBackupModal ref="backupSettingsModal" :server="server" />
 
       <ul class="m-0 flex list-none flex-col gap-4 p-0">
         <div class="relative w-full overflow-hidden rounded-2xl bg-bg-raised p-6 shadow-md">

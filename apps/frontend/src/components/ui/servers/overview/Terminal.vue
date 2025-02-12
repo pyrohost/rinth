@@ -140,7 +140,10 @@
                   class="group"
                 >
                   <div class="flex items-center gap-2">
-                    <UiServersLogLine :log="item" @show-full-log="showFullLogMessage" />
+                    <UiServersOverviewTerminalLine
+                      :log="item"
+                      @show-full-log="showFullLogMessage"
+                    />
                     <div @mousedown.stop @click.stop>
                       <button
                         v-if="searchInput"

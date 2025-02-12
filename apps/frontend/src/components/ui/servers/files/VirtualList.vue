@@ -18,7 +18,7 @@
         }"
         data-pyro-files-virtual-list
       >
-        <UiServersFileItem
+        <UiServersFilesItem
           v-for="item in visibleItems"
           :key="item.path"
           :count="item.count"
@@ -34,7 +34,7 @@
           @move="$emit('move', item)"
           @move-direct-to="$emit('moveDirectTo', $event)"
           @edit="$emit('edit', item)"
-          @contextmenu="(x, y) => $emit('contextmenu', item, x, y)"
+          @contextmenu="(x: number, y: number) => $emit('contextmenu', item, x, y)"
         />
       </ul>
     </div>

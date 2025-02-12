@@ -175,6 +175,7 @@
         </ButtonStyled>
       </div>
     </div>
+
     <!-- SERVER START -->
     <div
       v-else-if="serverData"
@@ -222,7 +223,7 @@
             </div>
           </div>
 
-          <UiServersServerInfoLabels
+          <UiServersLabels
             :server-data="serverData"
             :show-game-label="showGameLabel"
             :show-loader-label="showLoaderLabel"
@@ -345,7 +346,7 @@
           data-pyro-server-ws-reconnecting
           class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-sm text-contrast"
         >
-          <UiServersPanelSpinner />
+          <LazyUiServersIconsSpinnerIcon />
           Hang on, we're reconnecting to your server.
         </div>
 
@@ -359,7 +360,7 @@
           <div class="flex flex-col gap-1">
             <span class="text-lg font-bold"> We're preparing your server! </span>
             <div class="flex flex-row items-center gap-2">
-              <UiServersPanelSpinner class="!h-3 !w-3" /> <LazyUiServersInstallingTicker />
+              <LazyUiServersIconsSpinnerIcon class="!h-3 !w-3" /> <LazyUiServersInstallingTicker />
             </div>
           </div>
         </div>
@@ -454,7 +455,6 @@ const error = ref<Error | null>(null);
 const isConnected = ref(false);
 const isWSAuthIncorrect = ref(false);
 const pyroConsole = usePyroConsole();
-console.log("||||||||||||||||||||||| console", pyroConsole.output);
 const cpuData = ref<number[]>([]);
 const ramData = ref<number[]>([]);
 const isActioning = ref(false);

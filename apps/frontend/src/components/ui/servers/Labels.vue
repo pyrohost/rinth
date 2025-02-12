@@ -1,24 +1,24 @@
 <template>
   <div>
-    <UiServersServerGameLabel
+    <UiServersLabelGame
       v-if="showGameLabel"
       :game="serverData.game"
       :mc-version="serverData.mc_version ?? ''"
       :is-link="linked"
     />
-    <UiServersServerLoaderLabel
+    <UiServersLabelPlatform
       :loader="serverData.loader"
       :loader-version="serverData.loader_version ?? ''"
       :no-separator="column"
       :is-link="linked"
     />
-    <UiServersServerSubdomainLabel
+    <UiServersLabelSubdomain
       v-if="serverData.net?.domain"
       :subdomain="serverData.net.domain"
       :no-separator="column"
       :is-link="linked"
     />
-    <UiServersServerUptimeLabel
+    <UiServersLabelUptime
       v-if="uptimeSeconds"
       :uptime-seconds="uptimeSeconds"
       :no-separator="column"

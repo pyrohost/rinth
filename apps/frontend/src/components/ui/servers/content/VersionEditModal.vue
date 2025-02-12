@@ -68,6 +68,7 @@
             class="!min-w-full"
             :disabled="filteredVersions.length === 0"
             :display-name="
+              // @ts-ignore
               (version) => (typeof version === 'object' ? version?.version_number : version)
             "
           />
@@ -243,7 +244,7 @@ import Checkbox from "~/components/ui/Checkbox.vue";
 import ContentVersionFilter, {
   type ListedGameVersion,
   type ListedPlatform,
-} from "~/components/ui/servers/ContentVersionFilter.vue";
+} from "~/components/ui/servers/content/VersionFilter.vue";
 import LoaderIcon from "~/components/ui/servers/icons/LoaderIcon.vue";
 
 const props = defineProps<{

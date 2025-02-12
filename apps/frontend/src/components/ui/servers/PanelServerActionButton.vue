@@ -32,7 +32,7 @@
       :header="`All of ${props.serverName ? props.serverName : 'Server'} info`"
       @close="closeDetailsModal"
     >
-      <UiServersServerInfoLabels
+      <UiServersLabels
         :server-data="serverData"
         :show-game-label="true"
         :show-loader-label="true"
@@ -48,7 +48,7 @@
     <div class="flex flex-row items-center gap-2 rounded-lg">
       <ButtonStyled v-if="isInstalling" type="standard" color="brand">
         <button disabled class="flex-shrink-0">
-          <UiServersPanelSpinner class="size-5" /> Installing...
+          <LazyUiServersIconsSpinnerIcon class="size-5" /> Installing...
         </button>
       </ButtonStyled>
       <div v-else class="contents">
