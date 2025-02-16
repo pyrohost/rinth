@@ -31,9 +31,10 @@ const emit = defineEmits<{
   (event: "filesDropped", files: File[]): void;
 }>();
 
-defineProps<{
+const props = defineProps<{
   overlayClass?: string;
   type?: string;
+  disabled: boolean;
 }>();
 
 const isDragging = ref(false);
@@ -41,6 +42,7 @@ const dragCounter = ref(0);
 
 const handleDragEnter = (event: DragEvent) => {
   event.preventDefault();
+  if (props.disabled) return;
   if (!event.dataTransfer?.types.includes("application/pyro-file-move")) {
     dragCounter.value++;
     isDragging.value = true;
@@ -53,6 +55,7 @@ const handleDragOver = (event: DragEvent) => {
 
 const handleDragLeave = (event: DragEvent) => {
   event.preventDefault();
+  if (props.disabled) return;
   dragCounter.value--;
   if (dragCounter.value === 0) {
     isDragging.value = false;
@@ -61,6 +64,7 @@ const handleDragLeave = (event: DragEvent) => {
 
 const handleDrop = (event: DragEvent) => {
   event.preventDefault();
+  if (props.disabled) return;
   isDragging.value = false;
   dragCounter.value = 0;
 

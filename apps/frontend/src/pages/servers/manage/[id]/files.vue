@@ -27,6 +27,7 @@
 
     <FilesUploadDragAndDrop
       class="relative flex w-full flex-col rounded-2xl border border-solid border-bg-raised"
+      :disabled="isEditing"
       @files-dropped="handleDroppedFiles"
     >
       <div ref="mainContent" class="relative isolate flex w-full flex-col">
