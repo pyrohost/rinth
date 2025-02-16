@@ -1,9 +1,8 @@
 <template>
-  <div ref="pyroFilesSentinel" class="sentinel" data-pyro-files-sentinel />
   <header
     :class="[
       'duration-20 top-0 flex select-none flex-col justify-between gap-2 bg-table-alternateRow p-3 transition-[border-radius] sm:h-12 sm:flex-row',
-      !isStuck ? 'rounded-t-2xl' : 'sticky top-0 z-20',
+      !props.isStuck ? 'rounded-t-2xl' : 'sticky top-0 z-20',
     ]"
     data-pyro-files-state="browsing"
     aria-label="File navigation"
@@ -151,13 +150,13 @@ import {
   FilterIcon,
 } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
-import { ref, computed } from "vue";
-import { useIntersectionObserver } from "@vueuse/core";
+import { computed } from "vue";
 
 const props = defineProps<{
   breadcrumbSegments: string[];
   searchQuery: string;
   currentFilter: string;
+  isStuck: boolean;
 }>();
 
 defineEmits<{
@@ -167,17 +166,6 @@ defineEmits<{
   (e: "update:searchQuery", value: string): void;
   (e: "filter", type: string): void;
 }>();
-
-const pyroFilesSentinel = ref<HTMLElement | null>(null);
-const isStuck = ref(false);
-
-useIntersectionObserver(
-  pyroFilesSentinel,
-  ([{ isIntersecting }]) => {
-    isStuck.value = !isIntersecting;
-  },
-  { threshold: [0, 1] },
-);
 
 const filterLabel = computed(() => {
   switch (props.currentFilter) {
@@ -192,15 +180,6 @@ const filterLabel = computed(() => {
 </script>
 
 <style scoped>
-.sentinel {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  visibility: hidden;
-}
-
 .breadcrumb-move,
 .breadcrumb-enter-active,
 .breadcrumb-leave-active {

@@ -26,16 +26,25 @@
     />
 
     <FilesUploadDragAndDrop
-      class="relative flex w-full flex-col rounded-2xl border border-solid border-bg-raised"
+      :class="[
+        'relative flex w-full flex-col rounded-2xl border border-solid border-bg-raised transition-[border-radius]',
+        { 'rounded-t-none': isStuck },
+      ]"
       :disabled="isEditing"
       @files-dropped="handleDroppedFiles"
     >
       <div ref="mainContent" class="relative isolate flex w-full flex-col">
+        <div
+          ref="pyroFilesSentinel"
+          class="invisible absolute inset-x-0 top-0 h-px"
+          data-pyro-files-sentinel
+        />
         <div v-if="!isEditing" class="contents">
           <UiServersFilesBrowseNavbar
             :breadcrumb-segments="breadcrumbSegments"
             :search-query="searchQuery"
             :current-filter="viewFilter"
+            :is-stuck="isStuck"
             @navigate="navigateToSegment"
             @create="showCreateModal"
             @upload="initiateFileUpload"
@@ -159,7 +168,7 @@
 </template>
 
 <script setup lang="ts">
-import { useInfiniteScroll } from "@vueuse/core";
+import { useInfiniteScroll, useIntersectionObserver } from "@vueuse/core";
 import { UploadIcon, FolderOpenIcon } from "@modrinth/assets";
 import type { DirectoryResponse, DirectoryItem, Server } from "~/composables/pyroServers";
 import FilesUploadDragAndDrop from "~/components/ui/servers/FilesUploadDragAndDrop.vue";
@@ -240,6 +249,17 @@ const handleFilter = (type: string) => {
   sortMethod.value = "name";
   sortDesc.value = false;
 };
+
+const pyroFilesSentinel = ref<HTMLElement | null>(null);
+const isStuck = ref(false);
+
+useIntersectionObserver(
+  pyroFilesSentinel,
+  ([{ isIntersecting }]) => {
+    isStuck.value = !isIntersecting;
+  },
+  { threshold: [0, 1] },
+);
 
 useHead({
   title: computed(() => `Files - ${data.value?.name ?? "Server"} - Modrinth`),

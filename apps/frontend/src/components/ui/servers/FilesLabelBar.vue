@@ -1,7 +1,7 @@
 <template>
   <div
     aria-hidden="true"
-    class="sticky top-12 z-20 hidden h-8 w-full select-none flex-row items-center border-0 border-b border-solid border-bg-raised bg-bg text-xs sm:flex"
+    class="sticky top-12 z-[19] hidden h-8 w-full select-none flex-row items-center border-0 border-b border-solid border-bg-raised bg-bg text-xs sm:flex"
   >
     <button
       :class="[
