@@ -102,7 +102,7 @@
             theme="one_dark"
             :print-margin="false"
             style="height: 750px; font-size: 1rem"
-            class="ace_editor ace_hidpi ace-one-dark ace_dark rounded-b-lg"
+            class="ace_editor ace_hidpi ace-one-dark ace_dark rounded-b-lg [&_input:focus]:!text-black"
             @init="onInit"
           />
           <UiServersFilesImageViewer v-else :image-blob="imagePreview" />
