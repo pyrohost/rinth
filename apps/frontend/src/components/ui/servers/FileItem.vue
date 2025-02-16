@@ -35,8 +35,11 @@
         >
           {{ name }}
         </span>
-        <span class="pointer-events-none text-xs text-secondary group-hover:text-primary">
-          {{ subText }}
+        <span
+          class="pointer-events-none inline-flex text-xs text-secondary group-hover:text-primary"
+        >
+          {{ folderCount === "" ? formattedSize : folderCount }}
+          <span class="block sm:hidden">&nbsp;- {{ dayjs(props.modified * 1000).fromNow() }}</span>
         </span>
       </div>
     </div>
@@ -47,7 +50,7 @@
       <span class="hidden w-[160px] text-nowrap font-mono text-sm text-secondary md:flex">
         {{ formattedCreationDate }}
       </span>
-      <span class="w-[160px] text-nowrap font-mono text-sm text-secondary">
+      <span class="hidden w-[160px] text-nowrap font-mono text-sm text-secondary sm:flex">
         {{ formattedModifiedDate }}
       </span>
       <ButtonStyled circular type="transparent">
@@ -77,6 +80,7 @@ import {
 import { computed, shallowRef, ref } from "vue";
 import { renderToString } from "vue/server-renderer";
 import { useRouter, useRoute } from "vue-router";
+import dayjs from "dayjs";
 import {
   UiServersIconsCogFolderIcon,
   UiServersIconsEarthIcon,
@@ -192,11 +196,11 @@ const iconComponent = computed(() => {
   return FileIcon;
 });
 
-const subText = computed(() => {
+const folderCount = computed(() => {
   if (props.type === "directory") {
-    return `${props.count} ${props.count === 1 ? "item" : "items"}`;
+    return props.count === 1 ? "1 item" : `${props.count} items`;
   }
-  return formattedSize.value;
+  return "";
 });
 
 const formattedModifiedDate = computed(() => {
