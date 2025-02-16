@@ -128,6 +128,8 @@ const optionsContainer = ref<HTMLElement | null>(null);
 const scrollTop = ref(0);
 const isRenderingUp = ref(false);
 const virtualListHeight = ref(300);
+const alreadyOverflowHidden = ref(false);
+const alreadyMarginAdjusted = ref(false);
 const isOpen = ref(false);
 const openDropdownCount = ref(0);
 const listboxId = `pyro-listbox-${Math.random().toString(36).substring(2, 11)}`;
@@ -142,6 +144,7 @@ const positionStyle = ref<CSSProperties>({
 });
 
 const totalHeight = computed(() => props.options.length * ITEM_HEIGHT);
+const scrollBarWidth = computed(() => window.innerWidth - document.documentElement.clientWidth);
 
 const visibleOptions = computed(() => {
   const startIndex = Math.floor(scrollTop.value / ITEM_HEIGHT) - BUFFER_ITEMS;
@@ -241,6 +244,11 @@ const closeAllDropdowns = () => {
   window.dispatchEvent(event);
 };
 
+const revertOverflow = () => {
+  if (!alreadyOverflowHidden.value) document.body.style.overflow = "";
+  if (!alreadyMarginAdjusted.value) document.body.style.paddingRight = "";
+};
+
 const selectOption = (option: OptionValue, index: number) => {
   radioValue.value = option;
   emit("change", { option, index });
@@ -288,7 +296,14 @@ const openDropdown = async () => {
     dropdownVisible.value = true;
     isOpen.value = true;
     openDropdownCount.value++;
+
+    alreadyMarginAdjusted.value = document.body.style.paddingRight !== "";
+    if (!alreadyMarginAdjusted.value)
+      document.body.style.paddingRight = `${scrollBarWidth.value}px`;
+
+    alreadyOverflowHidden.value = document.body.style.overflow === "hidden";
     document.body.style.overflow = "hidden";
+
     await updatePosition();
 
     nextTick(() => {
@@ -302,9 +317,7 @@ const closeDropdown = () => {
     dropdownVisible.value = false;
     isOpen.value = false;
     openDropdownCount.value--;
-    if (openDropdownCount.value === 0) {
-      document.body.style.overflow = "";
-    }
+    if (openDropdownCount.value === 0) revertOverflow();
     focusedOptionIndex.value = null;
     triggerRef.value?.focus();
   }
@@ -422,9 +435,7 @@ onUnmounted(() => {
 
   if (isOpen.value) {
     openDropdownCount.value--;
-    if (openDropdownCount.value === 0) {
-      document.body.style.overflow = "";
-    }
+    if (openDropdownCount.value === 0) revertOverflow();
   }
 });
 
