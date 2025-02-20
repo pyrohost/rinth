@@ -18,7 +18,7 @@ import { ref, onMounted, onUnmounted } from "vue";
 
 const msgs = [
   "Organizing files...",
-  "Downloading mods...",
+  "Downloading content...",
   "Configuring server...",
   "Setting up environment...",
   "Adding Java...",
