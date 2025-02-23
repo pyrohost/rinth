@@ -13,12 +13,12 @@
               <button :disabled="props.isUpdating" @click="props.reset">Reset</button>
             </ButtonStyled>
             <ButtonStyled type="standard" :color="props.restart ? 'standard' : 'brand'">
-              <button :disabled="props.isUpdating" @click="props.save">
+              <button :disabled="props.isUpdating || props.disabled" @click="props.save">
                 {{ props.isUpdating ? "Saving..." : "Save" }}
               </button>
             </ButtonStyled>
             <ButtonStyled v-if="props.restart" type="standard" color="brand">
-              <button :disabled="props.isUpdating" @click="saveAndRestart">
+              <button :disabled="props.isUpdating || props.disabled" @click="saveAndRestart">
                 {{ props.isUpdating ? "Saving..." : "Save & restart" }}
               </button>
             </ButtonStyled>
@@ -40,6 +40,7 @@ const props = defineProps<{
   reset: () => void;
   isVisible: boolean;
   server: Server<["general", "content", "backups", "network", "startup", "ws", "fs"]>;
+  disabled?: boolean;
 }>();
 
 const saveAndRestart = async () => {

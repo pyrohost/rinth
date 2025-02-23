@@ -38,7 +38,58 @@
 
         <div class="card flex flex-col gap-4">
           <label for="server-subdomain" class="flex flex-col gap-2">
-            <span class="text-lg font-bold text-contrast">Custom URL</span>
+            <div class="flex items-center gap-2">
+              <span class="text-lg font-bold text-contrast">Custom URL</span>
+              <Transition name="subdomainCheck">
+                <div
+                  v-if="subdomainStatus !== 'unchanged' && !subdomainStatusFail"
+                  :class="[
+                    'flex flex-row items-center rounded-full p-1 pr-2 transition-colors duration-200',
+                    subdomainStatus === 'available'
+                      ? 'bg-bg-green'
+                      : subdomainStatus === 'unavailable'
+                        ? 'bg-bg-red'
+                        : 'bg-bg-orange',
+                  ]"
+                >
+                  <div
+                    :class="[
+                      'mx-1 size-4 rounded-full transition-colors duration-200',
+                      subdomainStatus === 'available'
+                        ? 'bg-brand'
+                        : subdomainStatus === 'unavailable'
+                          ? 'bg-red'
+                          : 'animate-pulse bg-orange',
+                    ]"
+                  ></div>
+                  <div
+                    v-if="subdomainStatus === 'available'"
+                    class="mx-1 -ml-5 size-4 animate-ping rounded-full bg-green opacity-20 delay-1000"
+                  />
+                  <div class="relative text-sm font-semibold text-contrast">
+                    <Transition name="subdomainCheckText">
+                      <span v-if="subdomainStatus === 'available'" class="absolute left-0">
+                        Available
+                      </span>
+                      <span v-else-if="subdomainStatus === 'unavailable'" class="absolute left-0">
+                        Unavailable
+                      </span>
+                      <span v-else class="absolute left-0">Checking...</span>
+                    </Transition>
+                    <!-- maintains container width -->
+                    <span class="invisible">
+                      {{
+                        subdomainStatus === "available"
+                          ? "Available"
+                          : subdomainStatus === "unavailable"
+                            ? "Unavailable"
+                            : "Checking..."
+                      }}
+                    </span>
+                  </div>
+                </div>
+              </Transition>
+            </div>
             <span> Your friends can connect to your server using this URL. </span>
           </label>
           <div class="flex w-full items-center gap-2 md:w-[60%]">
@@ -102,11 +153,12 @@
     </div>
     <div v-else />
     <UiServersSaveBanner
-      :is-visible="!!hasUnsavedChanges && !!isValidServerName"
+      :is-visible="!!hasUnsavedChanges"
       :server="props.server"
       :is-updating="isUpdating"
       :save="saveGeneral"
       :reset="resetGeneral"
+      :disabled="!!cantSaveChanges"
     />
   </div>
 </template>
@@ -135,7 +187,15 @@ const isUpdating = ref(false);
 const hasUnsavedChanges = computed(
   () =>
     (serverName.value && serverName.value !== data.value?.name) ||
-    serverSubdomain.value !== data.value?.net?.domain,
+    (subdomainStatus.value !== "unchanged" && subdomainStatus.value !== "checking"),
+);
+const cantSaveChanges = computed(
+  () =>
+    hasUnsavedChanges.value &&
+    (!isValidServerName.value ||
+      !isValidSubdomain.value ||
+      subdomainStatusFail.value ||
+      (subdomainStatus.value !== "unchanged" && subdomainStatus.value !== "available")),
 );
 const isValidServerName = computed(() => (serverName.value?.length ?? 0) > 0);
 
@@ -145,53 +205,96 @@ watch(serverName, (oldValue) => {
   }
 });
 
-const saveGeneral = async () => {
-  if (!isValidServerName.value || !isValidSubdomain.value) return;
+type SubdomainStatus = "unchanged" | "available" | "unavailable" | "checking";
+const subdomainStatus = ref<SubdomainStatus>("unchanged");
+const subdomainStatusFail = ref(false);
 
+let fetchDebounce: NodeJS.Timeout;
+let showDebounce: NodeJS.Timeout;
+let requestId = 0;
+
+const checkSubdomainAvailability = async (
+  newValue: string,
+  currentRequestId?: number,
+): Promise<boolean> => {
+  try {
+    if (!props.server.network) {
+      throw new Error("Network module not available");
+    }
+
+    const response = await props.server.network.checkSubdomainAvailability(newValue);
+
+    if (currentRequestId && currentRequestId !== requestId) {
+      return false;
+    }
+
+    if (response === undefined) {
+      throw new Error("Response was blank");
+    }
+
+    if (typeof response === "object" && response !== null && "available" in response) {
+      const typedResponse = response as { available: boolean };
+      subdomainStatus.value = typedResponse.available ? "available" : "unavailable";
+      return typedResponse.available;
+    } else {
+      throw new Error("Invalid response format");
+    }
+  } catch (error) {
+    console.error(`Subdomain check for "${newValue}" failed:`, error);
+    if (currentRequestId && currentRequestId !== requestId) return false;
+
+    addNotification({
+      group: "serverOptions",
+      type: "error",
+      title: "Failed to check subdomain availability",
+      text: `An error occurred while attempting to check if "${newValue}" is available.`,
+    });
+
+    subdomainStatusFail.value = true;
+    return false;
+  }
+};
+
+watch(
+  serverSubdomain,
+  (newValue) => {
+    subdomainStatusFail.value = false;
+    const currentRequestId = ++requestId;
+    clearTimeout(fetchDebounce);
+    clearTimeout(showDebounce);
+
+    if (newValue === data.value?.net?.domain || !isValidSubdomain.value) {
+      subdomainStatus.value = "unchanged";
+      return;
+    }
+
+    showDebounce = setTimeout(() => {
+      subdomainStatus.value = "checking";
+    }, 500);
+
+    fetchDebounce = setTimeout(() => {
+      checkSubdomainAvailability(newValue, currentRequestId);
+    }, 1000);
+  },
+  { immediate: false },
+);
+
+const saveGeneral = async () => {
   try {
     isUpdating.value = true;
     if (serverName.value !== data.value?.name) {
       await data.value?.updateName(serverName.value ?? "");
     }
     if (serverSubdomain.value !== data.value?.net?.domain) {
-      try {
-        // type shit backend makes me do
-        const response = await props.server.network?.checkSubdomainAvailability(
-          serverSubdomain.value,
-        );
-        if (response === undefined) {
-          throw new Error("Failed to check subdomain availability");
-        }
-
-        if (typeof response === "object" && response !== null && "available" in response) {
-          const typedResponse = response as { available: boolean };
-          if (!typedResponse.available) {
-            addNotification({
-              group: "serverOptions",
-              type: "error",
-              title: "Subdomain not available",
-              text: "The subdomain you entered is already in use.",
-            });
-            return;
-          }
-        } else {
-          throw new Error("Invalid response format from availability check");
-        }
-
+      if (await checkSubdomainAvailability(serverSubdomain.value)) {
         await props.server.network?.changeSubdomain(serverSubdomain.value);
-      } catch (error) {
-        console.error("Error checking subdomain availability:", error);
-        addNotification({
-          group: "serverOptions",
-          type: "error",
-          title: "Error checking availability",
-          text: "Failed to verify if the subdomain is available.",
-        });
+      } else {
         return;
       }
     }
     await new Promise((resolve) => setTimeout(resolve, 500));
     await props.server.refresh();
+    subdomainStatus.value = "unchanged";
     addNotification({
       group: "serverOptions",
       type: "success",
@@ -343,3 +446,39 @@ const triggerFileInput = () => {
   input.click();
 };
 </script>
+
+<style scoped>
+.subdomainCheck-enter-active,
+.subdomainCheck-leave-active {
+  transition: all 0.15s ease-in-out;
+}
+
+.subdomainCheck-enter-from,
+.subdomainCheck-leave-to {
+  opacity: 0;
+  transform: translateX(-1rem) scale(0.9);
+  filter: blur(4px);
+}
+
+.subdomainCheck-enter-to,
+.subdomainCheck-leave-from {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+.subdomainCheckText-enter-active,
+.subdomainCheckText-leave-active {
+  transition: all 0.15s ease-out;
+}
+
+.subdomainCheckText-enter-from {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.subdomainCheckText-leave-to {
+  opacity: 0;
+  transform: scale(0.9);
+}
+</style>
