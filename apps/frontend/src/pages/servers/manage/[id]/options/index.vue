@@ -14,6 +14,7 @@
               class="w-full md:w-[50%]"
               maxlength="48"
               minlength="1"
+              :disabled="isUpdating"
               @keyup.enter="!serverName && saveGeneral"
             />
             <span v-if="!serverName" class="text-sm text-rose-400">
@@ -98,6 +99,7 @@
               v-model="serverSubdomain"
               class="h-[50%] w-[63%]"
               maxlength="32"
+              :disabled="isUpdating"
               @keyup.enter="saveGeneral"
             />
             .modrinth.gg
@@ -120,7 +122,10 @@
           <div class="flex gap-4">
             <div
               v-tooltip="'Upload a custom Icon'"
-              class="group relative flex w-fit cursor-pointer items-center gap-2 rounded-xl bg-table-alternateRow"
+              :class="[
+                'group relative flex w-fit items-center gap-2 rounded-xl bg-table-alternateRow',
+                isUpdating ? 'cursor-not-allowed' : 'cursor-pointer',
+              ]"
               @dragover.prevent="onDragOver"
               @dragleave.prevent="onDragLeave"
               @drop.prevent="onDrop"
@@ -142,7 +147,11 @@
               <UiServersServerIcon :image="icon" />
             </div>
             <ButtonStyled>
-              <button v-tooltip="'Synchronize icon with installed modpack'" @click="resetIcon">
+              <button
+                v-tooltip="'Synchronize icon with installed modpack'"
+                :disabled="isUpdating"
+                @click="resetIcon"
+              >
                 <TransferIcon class="h-6 w-6" />
                 <span>Sync icon</span>
               </button>
@@ -198,12 +207,6 @@ const cantSaveChanges = computed(
       (subdomainStatus.value !== "unchanged" && subdomainStatus.value !== "available")),
 );
 const isValidServerName = computed(() => (serverName.value?.length ?? 0) > 0);
-
-watch(serverName, (oldValue) => {
-  if (!isValidServerName.value) {
-    serverName.value = oldValue;
-  }
-});
 
 type SubdomainStatus = "unchanged" | "available" | "unavailable" | "checking";
 const subdomainStatus = ref<SubdomainStatus>("unchanged");
@@ -434,10 +437,12 @@ const onDragLeave = (e: DragEvent) => {
 
 const onDrop = (e: DragEvent) => {
   e.preventDefault();
+  if (isUpdating.value) return;
   uploadFile(e);
 };
 
 const triggerFileInput = () => {
+  if (isUpdating.value) return;
   const input = document.createElement("input");
   input.type = "file";
   input.id = "server-icon-field";
